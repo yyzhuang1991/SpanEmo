@@ -114,7 +114,7 @@ class PredictDataClass(Dataset):
         """
         :return: dataset after being preprocessed and tokenised
         """
-        fobj = pd.read_excel(self.filename, dtype = 'object')
+        fobj = pd.read_csv(self.filename, dtype = 'object')
         fobj = fobj[fobj['label'].notna()]
         prev_sentences = [t for t in fobj['prev sentence']]
         sentences = [t for t in fobj['sentence']]
