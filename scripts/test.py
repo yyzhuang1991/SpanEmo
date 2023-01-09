@@ -33,7 +33,7 @@ else:
 #####################################################################
 # Define Dataloaders
 #####################################################################
-test_dataset = PredictDataClass(args, args['--test-path'], args['--use_prev_sentence'])
+test_dataset = PredictDataClass(args, args['--test-path'], 1)
 test_data_loader = DataLoader(test_dataset,
                               batch_size=int(args['--test-batch-size']),
                               shuffle=False)
