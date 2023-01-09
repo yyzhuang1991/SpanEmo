@@ -92,7 +92,9 @@ with open(args['--test-path'] + ".out.withprev.json", "w") as f:
 
 
 learn = Predictor(model, test_data_loader, model_path='models/' + args['--model-path'])
+
 pred = learn.predict(device=device)
+
 with open(args['--test-path'] + ".out.json", "w") as f:
     json.dump(pred, f)
 
