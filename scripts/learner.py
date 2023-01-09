@@ -236,7 +236,7 @@ class Predictor(object):
         self.test_data_loader = test_data_loader
         self.model_path = model_path
 
-    def predict(self, device='cuda:0', pbar=None):
+    def predict(self, device='cuda:0', pbar=None, return_loss = False):
         """
         Evaluate the model on a validation set
         :param device: str (defaults to 'cuda:0')
@@ -251,7 +251,7 @@ class Predictor(object):
         with torch.no_grad():
             index_dict = 0
             for step, batch in enumerate(progress_bar(self.test_data_loader, parent=pbar, leave=(pbar is not None))):
-                _, num_rows, y_pred, targets = self.model(batch, device)
+                num_rows, y_pred, targets = self.model(batch, device, return_loss = return_loss)
                 current_index = index_dict
                 # preds_dict['y_true'][current_index: current_index + num_rows, :] = targets
                 preds_dict['y_pred'][current_index: current_index + num_rows, :] = y_pred

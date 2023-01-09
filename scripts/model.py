@@ -51,7 +51,7 @@ class SpanEmo(nn.Module):
             nn.Linear(self.bert.feature_size, 1)
         )
 
-    def forward(self, batch, device):
+    def forward(self, batch, device, return_loss = True):
         """
         :param batch: tuple of (input_ids, labels, length, label_indices)
         :param device: device to run calculations on
@@ -69,19 +69,23 @@ class SpanEmo(nn.Module):
         # select span of labels to compare them with ground truth ones
         logits = self.ffn(last_hidden_state).squeeze(-1).index_select(dim=1, index=label_idxs)
 
-        #Loss Function
-        if self.joint_loss == 'joint':
-            cel = F.binary_cross_entropy_with_logits(logits, targets).cuda()
-            cl = self.corr_loss(logits, targets)
-            loss = ((1 - self.alpha) * cel) + (self.alpha * cl)
-        elif self.joint_loss == 'cross-entropy':
-            loss = F.binary_cross_entropy_with_logits(logits, targets).cuda()
-        elif self.joint_loss == 'corr_loss':
-            loss = self.corr_loss(logits, targets)
+        if return_loss:
+            #Loss Function
+            if self.joint_loss == 'joint':
+                cel = F.binary_cross_entropy_with_logits(logits, targets).cuda()
+                cl = self.corr_loss(logits, targets)
+                loss = ((1 - self.alpha) * cel) + (self.alpha * cl)
+            elif self.joint_loss == 'cross-entropy':
+                loss = F.binary_cross_entropy_with_logits(logits, targets).cuda()
+            elif self.joint_loss == 'corr_loss':
+                loss = self.corr_loss(logits, targets)
 
         y_pred = self.compute_pred(logits)
-        return loss, num_rows, y_pred, targets.cpu().numpy()
 
+        if return_loss:
+            return loss, num_rows, y_pred, targets.cpu().numpy()
+        else:
+            return num_rows, y_pred, targets.cpu().numpy()
     @staticmethod
     def corr_loss(y_hat, y_true, reduction='mean'):
         """
