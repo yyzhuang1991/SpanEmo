@@ -135,7 +135,7 @@ class PredictDataClass(Dataset):
         else:
             x_train = [s for s in sentences]  
 
-        return x_train[:80], y_train[:80]
+        return x_train, y_train
 
         
     def process_data(self):
