@@ -26,6 +26,7 @@ def cal_score(true_labels, pred_labels, outfile):
     true = [] 
     pred = []
     for true_label, pred_label in zip(true_labels, pred_labels):
+        print(true_label)
         if true_label in ['2a', '2b']:
             true.append(0)
         elif true_label in ['3a', '3b']:
