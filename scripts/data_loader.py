@@ -96,3 +96,79 @@ class DataClass(Dataset):
 
     def __len__(self):
         return len(self.inputs)
+
+
+
+class PredictDataClass(Dataset):
+    def __init__(self, args, filename, include_prev_sentence):
+        self.args = args
+        self.filename = filename
+        self.max_length = int(args['--max-length'])
+        self.include_prev_sentence = include_prev_sentence
+        self.data, self.labels = self.load_dataset()
+        self.bert_tokeniser = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)    
+        self.inputs, self.lengths, self.label_indices = self.process_data()
+
+
+    def load_dataset(self):
+        """
+        :return: dataset after being preprocessed and tokenised
+        """
+        fobj = pd.read_excel(self.filename, dtype = 'object')
+        fobj = fobj[fobj['label'].notna()]
+        prev_sentences = [t for t in fobj['prev sentence']]
+        sentences = [t for t in fobj['sentence']]
+        if 'label' in fobj:
+            y_train = [int(k) for k in fobj["label"]]
+        else:
+            y_train = [-1] * len(sentences)
+            
+        if self.include_prev_sentence:
+            x_train = [f"{p} {s}" for p, s in zip(prev_sentences, sentences)]
+        else:
+            x_train = [s for s in sentences]  
+
+        return x_train, y_train
+
+        
+    def process_data(self):
+        desc = "PreProcessing dataset {}...".format('')
+        preprocessor = twitter_preprocessor()
+
+        segment_a = "anger anticipation disgust fear joy love optimism hopeless sadness surprise or trust?"
+        label_names = ["anger", "anticipation", "disgust", "fear", "joy",
+                       "love", "optimism", "hopeless", "sadness", "surprise", "trust"]
+   
+        inputs, lengths, label_indices = [], [], []
+        for x in tqdm(self.data, desc=desc):
+            x = ' '.join(preprocessor(x))
+            x = self.bert_tokeniser.encode_plus(segment_a,
+                                                x,
+                                                add_special_tokens=True,
+                                                max_length=self.max_length,
+                                                pad_to_max_length=True,
+                                                truncation=True)
+            input_id = x['input_ids']
+            input_length = len([i for i in x['attention_mask'] if i == 1])
+            inputs.append(input_id)
+            lengths.append(input_length)
+
+            #label indices
+            label_idxs = [self.bert_tokeniser.convert_ids_to_tokens(input_id).index(label_names[idx])
+                             for idx, _ in enumerate(label_names)]
+            label_indices.append(label_idxs)
+
+        inputs = torch.tensor(inputs, dtype=torch.long)
+        data_length = torch.tensor(lengths, dtype=torch.long)
+        label_indices = torch.tensor(label_indices, dtype=torch.long)
+        return inputs, data_length, label_indices
+
+    def __getitem__(self, index):
+        inputs = self.inputs[index]
+        labels = self.labels[index]
+        label_idxs = self.label_indices[index]
+        length = self.lengths[index]
+        return inputs, labels, length, label_idxs
+
+    def __len__(self):
+        return len(self.inputs)

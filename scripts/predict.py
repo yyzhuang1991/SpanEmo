@@ -33,7 +33,7 @@ else:
 #####################################################################
 # Define Dataloaders
 #####################################################################
-test_dataset = PredictDataClass(args, args['--test-path'])
+test_dataset = DataClass(args, args['--test-path'])
 test_data_loader = DataLoader(test_dataset,
                               batch_size=int(args['--test-batch-size']),
                               shuffle=False)
@@ -42,7 +42,7 @@ print('The number of Test batches: ', len(test_data_loader))
 # Run the model on a Test set
 #############################################################################
 model = SpanEmo(lang=args['--lang'])
-learn = Predictor(model, test_data_loader, model_path='models/' + args['--model-path'])
-pred = learn.predict(device=device)
+learn = EvaluateOnTest(model, test_data_loader, model_path='models/' + args['--model-path'])
+learn.predict(device=device)
 
 
