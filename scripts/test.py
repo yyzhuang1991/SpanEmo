@@ -44,5 +44,5 @@ print('The number of Test batches: ', len(test_data_loader))
 model = SpanEmo(lang=args['--lang'])
 learn = Predictor(model, test_data_loader, model_path='models/' + args['--model-path'])
 pred = learn.predict(device=device)
-
+print(pred)
 
