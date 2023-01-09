@@ -243,6 +243,8 @@ class Predictor(object):
         :param pbar: fast_progress progress bar (defaults to None)
         :returns: None
         """
+        label_names = ["anger", "anticipation", "disgust", "fear", "joy",
+                           "love", "optimism", "hopeless", "sadness", "surprise", "trust"]
         self.model.to(device).load_state_dict(torch.load(self.model_path))
         self.model.eval()
 
@@ -256,7 +258,7 @@ class Predictor(object):
                 current_index = index_dict
                 # preds_dict['y_true'][current_index: current_index + num_rows, :] = targets
                 # preds_dict['y_pred'][current_index: current_index + num_rows, :] = y_pred
-                y_preds.extend(y_pred.tolist())
+                y_preds.extend([[ label_names[i] if p != 0 for i, p in enumerate(pred)] for pred in y_pred])
                 index_dict += num_rows
 
         # y_true, y_pred = preds_dict['y_true'], preds_dict['y_pred']
