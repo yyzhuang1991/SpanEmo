@@ -98,6 +98,11 @@ class DataClass(Dataset):
     def __len__(self):
         return len(self.inputs)
 
+def strip(text):
+    try:
+        return text.strip()
+    except AttributeError:
+        return text
 
 
 class PredictDataClass(Dataset):
@@ -111,11 +116,12 @@ class PredictDataClass(Dataset):
         self.inputs, self.lengths, self.label_indices = self.process_data()
 
 
+
     def load_dataset(self):
         """
         :return: dataset after being preprocessed and tokenised
         """
-        fobj = pd.read_csv(self.filename, dtype = 'object')
+        fobj = pd.read_csv(self.filename, dtype = 'object', converters = {'label':strip})
         fobj = fobj[fobj['label'].notna()]
         prev_sentences = [t for t in fobj['prev sentence']]
         sentences = [t for t in fobj['sentence']]
