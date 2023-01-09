@@ -6,6 +6,7 @@ import pandas as pd
 from ekphrasis.classes.tokenizer import SocialTokenizer
 from ekphrasis.classes.preprocessor import TextPreProcessor
 
+classes = ['1','2a','2b','3a', '3b'] 
 
 def twitter_preprocessor():
     preprocessor = TextPreProcessor(
@@ -119,7 +120,7 @@ class PredictDataClass(Dataset):
         prev_sentences = [t for t in fobj['prev sentence']]
         sentences = [t for t in fobj['sentence']]
         if 'label' in fobj:
-            y_train = [int(k) for k in fobj["label"]]
+            y_train = [classes.index(k) for k in fobj["label"]]
         else:
             y_train = [-1] * len(sentences)
             
