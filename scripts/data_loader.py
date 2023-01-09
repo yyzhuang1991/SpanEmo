@@ -129,13 +129,13 @@ class PredictDataClass(Dataset):
             y_train = [classes.index(k) for k in fobj["label"]]
         else:
             y_train = [-1] * len(sentences)
-            
+        
         if self.include_prev_sentence:
             x_train = [f"{p} {s}" for p, s in zip(prev_sentences, sentences)]
         else:
             x_train = [s for s in sentences]  
 
-        return x_train, y_train
+        return x_train[:80], y_train[:80]
 
         
     def process_data(self):
