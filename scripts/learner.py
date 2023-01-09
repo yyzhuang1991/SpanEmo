@@ -258,7 +258,7 @@ class Predictor(object):
                 current_index = index_dict
                 # preds_dict['y_true'][current_index: current_index + num_rows, :] = targets
                 # preds_dict['y_pred'][current_index: current_index + num_rows, :] = y_pred
-                y_preds.extend([[ label_names[i] if p != 0 for i, p in enumerate(pred)] for pred in y_pred])
+                y_preds.extend([[ label_names[i] for i, p in enumerate(pred) if p != 0 ] for pred in y_pred])
                 index_dict += num_rows
 
         # y_true, y_pred = preds_dict['y_true'], preds_dict['y_pred']
