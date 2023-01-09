@@ -13,7 +13,7 @@ Options:
 """
 from learner import EvaluateOnTest
 from model import SpanEmo
-from data_loader import DataClass
+from data_loader import PredictDataClass
 from torch.utils.data import DataLoader
 import torch
 from docopt import docopt
