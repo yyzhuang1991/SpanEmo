@@ -26,7 +26,6 @@ def cal_score(true_labels, pred_labels, outfile):
     true = [] 
     pred = []
     for true_label, pred_label in zip(true_labels, pred_labels):
-        print(true_label)
         if true_label in [1, 2]:
             true.append(0) #emotioal
         elif true_label in [3, 4]:
@@ -42,8 +41,8 @@ def cal_score(true_labels, pred_labels, outfile):
     labels = ['emotional', 'non-emotional']
 
     pres, recs, f1s, _  = precision_recall_fscore_support(true, pred, average = None)
-    macro_pre, macro_rec, macro_f1, _ = precision_recall_fscore_support(true, pred, labels = labels, average = 'macro')
-    micro_pre, micro_rec, micro_f1, _ = precision_recall_fscore_support(true, pred, labels = labels, average = 'micro')
+    macro_pre, macro_rec, macro_f1, _ = precision_recall_fscore_support(true, pred, average = 'macro')
+    micro_pre, micro_rec, micro_f1, _ = precision_recall_fscore_support(true, pred, average = 'micro')
     strs = []
     strs.append(f"Precisions: {pres}")
     strs.append(f"Recalls: {recs}")
