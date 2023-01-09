@@ -248,13 +248,16 @@ class Predictor(object):
 
         current_size = len(self.test_data_loader.dataset)
         start_time = time.time()
+        y_preds = [] 
         with torch.no_grad():
             index_dict = 0
             for step, batch in enumerate(progress_bar(self.test_data_loader, parent=pbar, leave=(pbar is not None))):
                 num_rows, y_pred, targets = self.model(batch, device, return_loss = return_loss)
                 current_index = index_dict
                 # preds_dict['y_true'][current_index: current_index + num_rows, :] = targets
-                preds_dict['y_pred'][current_index: current_index + num_rows, :] = y_pred
+                # preds_dict['y_pred'][current_index: current_index + num_rows, :] = y_pred
+                print(type(y_pred))
+                y_preds.extend(y_pred.tolist())
                 index_dict += num_rows
 
         # y_true, y_pred = preds_dict['y_true'], preds_dict['y_pred']
