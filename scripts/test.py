@@ -88,7 +88,7 @@ model = SpanEmo(lang=args['--lang'])
 learn = Predictor(model, test_data_loader_with_prev, model_path='models/' + args['--model-path'])
 pred_with_prev = learn.predict(device=device)
 with open(args['--test-path'] + ".out.withprev.json", "w") as f:
-    json.dump(pred, f)
+    json.dump(pred_with_prev, f)
 
 
 learn = Predictor(model, test_data_loader, model_path='models/' + args['--model-path'])
