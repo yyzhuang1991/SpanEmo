@@ -11,7 +11,7 @@ Options:
     --lang=<str>                      language choice [default: English]
     --test-path=<str>                 file path of the test set [default: ]
 """
-from learner import EvaluateOnTest
+from learner import Predictor
 from model import SpanEmo
 from data_loader import PredictDataClass
 from torch.utils.data import DataLoader
