@@ -256,12 +256,11 @@ class Predictor(object):
                 current_index = index_dict
                 # preds_dict['y_true'][current_index: current_index + num_rows, :] = targets
                 # preds_dict['y_pred'][current_index: current_index + num_rows, :] = y_pred
-                print(type(y_pred))
                 y_preds.extend(y_pred.tolist())
                 index_dict += num_rows
 
         # y_true, y_pred = preds_dict['y_true'], preds_dict['y_pred']
-        return pred_dict['y_pred']
+        return y_preds
 
         # str_stats = []
         # stats = [f1_score(y_true, y_pred, average="macro"),
