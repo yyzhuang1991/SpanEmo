@@ -258,7 +258,7 @@ class PredictDataClass(Dataset):
             self.ephrase2exid = ephrase2exid
             self.input_data = data
             self.ephrases = list(ephrase2exid.keys())
-            x_train = ephrases
+            x_train = self.ephrases
             y_train = [-1] * len(sentences)
             
 
