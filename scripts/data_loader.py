@@ -9,7 +9,7 @@ import json
 
 import sys 
 from os.path import abspath, dirname, join
-tuple_util_path = join(dirname(dirname(abspath(__file__))), "emotion-reaction/model-scripts")
+tuple_util_path = join(dirname(dirname(dirname(abspath(__file__)))), "emotion-reaction/model-scripts")
 print(tuple_util_path)
 sys.path.append(tuple_util_path)
 import tuple_utils
