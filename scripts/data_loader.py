@@ -241,7 +241,7 @@ class PredictDataClass(Dataset):
             else:
                 y_train = [-1] * len(sentences)
         
-        elif use_events:
+        elif self.use_events:
             ephrase2exid = {} # ephrase to index in data
             data = fobj 
             for i, d in enumerate(data):
