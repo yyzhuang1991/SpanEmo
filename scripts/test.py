@@ -37,7 +37,7 @@ def cal_score(true_labels, pred_labels, outfile):
     macro_pre, macro_rec, macro_f1, _ = precision_recall_fscore_support(true, pred, average = 'macro')
     micro_pre, micro_rec, micro_f1, _ = precision_recall_fscore_support(true, pred, average = 'micro')
     strs = []
-    strs.append(f"NUM Samples: {len(true)}, NUM Emotional: {len([k for k in true if k == 0])}, Num Non-Emotional: {len([k for k in true if k == 1])}")
+    strs.append(f"NUM Samples: {len(true)}, NUM Emotional: {len([k for k in true if k == 1])}, Num Non-Emotional: {len([k for k in true if k == 0])}")
     strs.append(f"Precisions: {pres}")
     strs.append(f"Recalls: {recs}")
     strs.append(f"F1s: {f1s}")
