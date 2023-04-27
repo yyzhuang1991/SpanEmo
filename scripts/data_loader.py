@@ -56,6 +56,7 @@ class DataClass(Dataset):
         """
         df = pd.read_csv(self.filename, sep='\t')
         x_train, y_train = df.Tweet.values, df.iloc[:, 2:].values
+        print(x_train[0], y_train[0])
         return x_train, y_train
 
     def process_data(self):
