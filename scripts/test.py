@@ -23,22 +23,15 @@ from sklearn.metrics import precision_recall_fscore_support
 
 
 def cal_score(true_labels, pred_labels, outfile):
-    true = [] 
+    true = true_labels 
     pred = []
     for true_label, pred_label in zip(true_labels, pred_labels):
-        if true_label in [1, 2]:
-            true.append(0) #emotioal
-        elif true_label in [3, 4]:
-            true.append(1)
-        else:
-            continue 
-
         if len(pred_label):
-            pred.append(0)
+            pred.append(1)
         else:
-            pred.append(1)     
+            pred.append(0)     
 
-    labels = ['emotional', 'non-emotional']
+    labels = ['non-emotional', 'emotional']
 
     pres, recs, f1s, _  = precision_recall_fscore_support(true, pred, average = None)
     macro_pre, macro_rec, macro_f1, _ = precision_recall_fscore_support(true, pred, average = 'macro')
