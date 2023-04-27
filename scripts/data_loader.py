@@ -154,7 +154,7 @@ class PredictDataClass(Dataset):
 
                 sentences = []
                 for t in fobj: 
-                    center = t['word_bound'] + 1
+                    center = t['word_bound'][0] + 1
                     words = t['sentence'].split() 
                     left = max(0, center - self.kwords)
                     right = min(len(words), center + self.kwords + 1)
