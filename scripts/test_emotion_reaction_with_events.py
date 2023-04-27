@@ -63,7 +63,7 @@ else:
 #####################################################################
 
 
-test_dataset = PredictDataClass(int(args['--max-length']), args['--test-path'], use_events = True)
+test_dataset = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = False, use_events = True)
 test_data_loader = DataLoader(test_dataset,
                               batch_size=int(args['--test-batch-size']),
                               shuffle=False)

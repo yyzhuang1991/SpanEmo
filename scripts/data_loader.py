@@ -171,15 +171,17 @@ def strip(text):
 
 class PredictDataClass(Dataset):
     def __init__(self, max_length, filename, include_prev_sentence, kwords = 0, use_events = 0):
-        assert ((self.kwords > 0 )+ self.include_prev_sentence) + self.use_events <= 1
 
         self.filename = filename
         self.max_length = max_length
         self.include_prev_sentence = include_prev_sentence
         self.kwords = kwords
         self.use_events = use_events
+        
+        assert ((self.kwords > 0 )+ self.include_prev_sentence) + self.use_events <= 1
         self.data, self.labels = self.load_dataset()
-        self.bert_tokeniser = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)    
+        self.bert_tokeniser = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
+
         self.inputs, self.lengths, self.label_indices = self.process_data()
         
 
