@@ -24,6 +24,8 @@ from sklearn.metrics import precision_recall_fscore_support
 
 
 args = docopt(__doc__)
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
 if str(device) == 'cuda:0':
     print("Currently using GPU: {}".format(device))
     np.random.seed(int(args['--seed']))
@@ -43,7 +45,6 @@ test_data_loader = DataLoader(test_dataset,
 model = SpanEmo(lang="English")
 
 learn = Predictor(model, test_data_loader, model_path='models/' + args['--model-path'])
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 pred = learn.predict(device=device)
 
 ephrase2emotion = {}
