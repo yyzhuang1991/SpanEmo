@@ -1,0 +1,1 @@
+python scripts/test.py --test-path data/2018-E-c-En-test.txt  --model-path joint.pt

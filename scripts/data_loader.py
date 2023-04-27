@@ -194,6 +194,7 @@ class PredictDataClass(Dataset):
         inputs, lengths, label_indices = [], [], []
         for x in tqdm(self.data, desc=desc):
             x = ' '.join(preprocessor(x))
+            print(x)
             x = self.bert_tokeniser.encode_plus(segment_a,
                                                 x,
                                                 add_special_tokens=True,
