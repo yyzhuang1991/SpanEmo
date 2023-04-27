@@ -78,6 +78,12 @@ test_dataset = PredictDataClass(args, args['--test-path'], include_prev_sentence
 test_data_loader = DataLoader(test_dataset,
                               batch_size=int(args['--test-batch-size']),
                               shuffle=False)
+
+test_dataset_kwords = PredictDataClass(args, args['--test-path'], include_prev_sentence = 0, kwords = 5)
+test_data_loader_kwords = DataLoader(test_dataset_kwords,
+                              batch_size=int(args['--test-batch-size']),
+                              shuffle=False)
+
 true_labels = test_dataset.labels
 
 print('The number of Test batches: ', len(test_data_loader_with_prev))
@@ -86,18 +92,11 @@ print('The number of Test batches: ', len(test_data_loader_with_prev))
 #############################################################################
 model = SpanEmo(lang=args['--lang'])
 
-learn = Predictor(model, test_data_loader_with_prev, model_path='models/' + args['--model-path'])
-pred_with_prev = learn.predict(device=device)
-with open(args['--test-path'] + ".out.withprev.json", "w") as f:
-    json.dump(pred_with_prev, f)
+for loader, name in zip([test_data_loader, test_data_loader_with_prev, test_data_loader_kwords], ["current-sent", "with-prev", "kwords"]):
 
+    learn = Predictor(model, loader, model_path='models/' + args['--model-path'])
+    pred = learn.predict(device=device)
+    with open(args['--test-path'] + f".out.{name}.json", "w") as f:
+        json.dump(pred, f)
 
-learn = Predictor(model, test_data_loader, model_path='models/' + args['--model-path'])
-
-pred = learn.predict(device=device)
-
-with open(args['--test-path'] + ".out.json", "w") as f:
-    json.dump(pred, f)
-
-cal_score(true_labels, pred_with_prev, outfile = args['--test-path']+".eval.withprev")
-cal_score(true_labels, pred, outfile = args['--test-path']+".eval")
+    cal_score(true_labels, pred, outfile = args['--test-path']+f"{name}.eval")

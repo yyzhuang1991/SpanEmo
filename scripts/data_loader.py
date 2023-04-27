@@ -5,8 +5,19 @@ import torch
 import pandas as pd
 from ekphrasis.classes.tokenizer import SocialTokenizer
 from ekphrasis.classes.preprocessor import TextPreProcessor
+import json 
 
-classes = ['1','2a','2b','3a', '3b'] 
+# classes = ['1','2a','2b','3a', '3b'] 
+classes = {
+    "1": 0, 
+    "3":0, 
+    "3a":0, 
+    "3b":0,
+    "2":1, 
+    "2a": 1, 
+    "2b":1, 
+    }
+
 
 def twitter_preprocessor():
     preprocessor = TextPreProcessor(
@@ -106,34 +117,59 @@ def strip(text):
 
 
 class PredictDataClass(Dataset):
-    def __init__(self, args, filename, include_prev_sentence):
+    def __init__(self, args, filename, include_prev_sentence, kwords = 0):
         self.args = args
         self.filename = filename
         self.max_length = int(args['--max-length'])
         self.include_prev_sentence = include_prev_sentence
+        self.kwords = kwords
         self.data, self.labels = self.load_dataset()
         self.bert_tokeniser = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)    
         self.inputs, self.lengths, self.label_indices = self.process_data()
-
+        assert ((self.kwords > 0 )+ include_prev_sentence) == 1
 
 
     def load_dataset(self):
         """
         :return: dataset after being preprocessed and tokenised
         """
-        fobj = pd.read_csv(self.filename, dtype = 'object', skipinitialspace=True)
-        fobj = fobj[fobj['label'].notna()]
-        prev_sentences = [t for t in fobj['prev sentence']]
-        sentences = [t for t in fobj['sentence']]
-        if 'label' in fobj:
-            y_train = [classes.index(k) for k in fobj["label"]]
-        else:
-            y_train = [-1] * len(sentences)
-        
+        if self.filename.endswith(".csv"):
+            assert False # because kwords and prev context are not implemented for csv file
+            fobj = pd.read_csv(self.filename, dtype = 'object', skipinitialspace=True)
+            fobj = fobj[fobj['label'].notna()]
+            prev_sentences = [t for t in fobj['prev sentence']]
+            sentences = [t for t in fobj['sentence']]
+            if 'label' in fobj:
+                y_train = [classes[k] for k in fobj["label"]]
+            else:
+                y_train = [-1] * len(sentences)
+            
+        elif self.filename.endswith(".json"):
+            with open(self.filename) as f:
+                fobj = json.load(f)
+            prev_sentences = [" ".join(t['prev_sentence']) for t in fobj]
+            sentences = [t['sentence'] for t in fobj]
+
+            if self.kwords > 0: 
+
+                sentences = []
+                for t in fobj: 
+                    center = t['word_bound'] + 1
+                    words = t['sentence'].split() 
+                    left = max(0, center - self.kwords)
+                    right = min(len(words), center + self.kwords + 1)
+                    sentences.append(" ".join(words[left:right]))  
+
+            if 'label' in fobj[0]:
+                y_train = [classes[t['label']] for t in fobj]
+            else:
+                y_train = [-1] * len(sentences)
+
         if self.include_prev_sentence:
             x_train = [f"{p} {s}" for p, s in zip(prev_sentences, sentences)]
         else:
-            x_train = [s for s in sentences]  
+            x_train = [s for s in sentences]
+
 
         return x_train, y_train
 
