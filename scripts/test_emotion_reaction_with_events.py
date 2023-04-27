@@ -49,7 +49,6 @@ def cal_score(true_labels, pred_labels, outfile):
         f.write(strs)
 
 args = docopt(__doc__)
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 if str(device) == 'cuda:0':
     print("Currently using GPU: {}".format(device))
     np.random.seed(int(args['--seed']))
@@ -63,13 +62,14 @@ else:
 #####################################################################
 
 
-test_dataset = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = False, use_events = True)
+test_dataset = PredictDataClass(128, args['--test-path'], include_prev_sentence = False, use_events = True)
 test_data_loader = DataLoader(test_dataset,
-                              batch_size=int(args['--test-batch-size']),
+                              batch_size=32,
                               shuffle=False)
-model = SpanEmo(lang=args['--lang'])
+model = SpanEmo(lang="English")
 
 learn = Predictor(model, test_data_loader, model_path='models/' + args['--model-path'])
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 pred = learn.predict(device=device)
 # with open(args['--test-path'] + f".out.{name}.json", "w") as f:
 #     json.dump(pred, f)
