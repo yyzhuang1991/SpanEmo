@@ -72,20 +72,27 @@ test_data_loader = DataLoader(test_dataset,
                               batch_size=int(args['--test-batch-size']),
                               shuffle=False)
 
-test_dataset_kwords = PredictDataClass(args['--max-length'], args['--test-path'], include_prev_sentence = 0, kwords = 5)
-test_data_loader_kwords = DataLoader(test_dataset_kwords,
+test_dataset_5words = PredictDataClass(args['--max-length'], args['--test-path'], include_prev_sentence = 0, kwords = 5)
+test_data_loader_5words = DataLoader(test_dataset_5kwords,
                               batch_size=int(args['--test-batch-size']),
                               shuffle=False)
 
-true_labels = test_dataset.labels
+
+test_dataset_3words = PredictDataClass(args['--max-length'], args['--test-path'], include_prev_sentence = 0, kwords = 3)
+test_data_loader_3words = DataLoader(test_dataset_3kwords,
+                              batch_size=int(args['--test-batch-size']),
+                              shuffle=False)
+
+
+true_labels = test_dataset_with_prev.labels
 
 print('The number of Test batches: ', len(test_data_loader_with_prev))
 #############################################################################
 # Run the model on a Test set
 #############################################################################
-model = SpanEmo(lang=args['--lang'])
 
-for loader, name in zip([test_data_loader, test_data_loader_with_prev, test_data_loader_kwords], ["current-sent", "with-prev", "kwords"]):
+for loader, name in zip([test_data_loader, test_data_loader_with_prev, test_data_loader_5words, test_data_loader_3words], ["current-sent", "with-prev", "5words", "3words"]):
+    model = SpanEmo(lang=args['--lang'])
 
     learn = Predictor(model, loader, model_path='models/' + args['--model-path'])
     pred = learn.predict(device=device)
