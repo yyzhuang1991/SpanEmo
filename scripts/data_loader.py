@@ -117,10 +117,9 @@ def strip(text):
 
 
 class PredictDataClass(Dataset):
-    def __init__(self, args, filename, include_prev_sentence, kwords = 0):
-        self.args = args
+    def __init__(self, max_length, filename, include_prev_sentence, kwords = 0):
         self.filename = filename
-        self.max_length = int(args['--max-length'])
+        self.max_length = max_length
         self.include_prev_sentence = include_prev_sentence
         self.kwords = kwords
         self.data, self.labels = self.load_dataset()
@@ -159,6 +158,15 @@ class PredictDataClass(Dataset):
                     left = max(0, center - self.kwords)
                     right = min(len(words), center + self.kwords + 1)
                     sentences.append(" ".join(words[left:right]))  
+
+                # sentences = []
+                # for t in fobj: 
+                #     center = t['word_bound'][0] + 1
+                #     words = t['sentence'].split() 
+                #     left = max(0, center - kwords)
+                #     right = min(len(words), center + kwords + 1)
+                #     sentences.append(" ".join(words[left:right]))  
+
 
             if 'label' in fobj[0]:
                 y_train = [classes[t['label']] for t in fobj]
