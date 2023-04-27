@@ -126,7 +126,7 @@ class PredictDataClass(Dataset):
         self.data, self.labels = self.load_dataset()
         self.bert_tokeniser = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)    
         self.inputs, self.lengths, self.label_indices = self.process_data()
-        assert ((self.kwords > 0 )+ include_prev_sentence) == 1
+        assert ((self.kwords > 0 )+ include_prev_sentence) <= 1
 
 
     def load_dataset(self):
