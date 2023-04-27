@@ -73,13 +73,13 @@ test_data_loader = DataLoader(test_dataset,
                               shuffle=False)
 
 test_dataset_5words = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = 0, kwords = 5)
-test_data_loader_5words = DataLoader(test_dataset_5kwords,
+test_data_loader_5words = DataLoader(test_dataset_5words,
                               batch_size=int(args['--test-batch-size']),
                               shuffle=False)
 
 
 test_dataset_3words = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = 0, kwords = 3)
-test_data_loader_3words = DataLoader(test_dataset_3kwords,
+test_data_loader_3words = DataLoader(test_dataset_3words,
                               batch_size=int(args['--test-batch-size']),
                               shuffle=False)
 
