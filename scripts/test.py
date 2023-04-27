@@ -62,23 +62,23 @@ else:
 # Define Dataloaders
 #####################################################################
 
-test_dataset_with_prev = PredictDataClass(args['--max-length'], args['--test-path'], include_prev_sentence = 1)
+test_dataset_with_prev = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = 1)
 test_data_loader_with_prev = DataLoader(test_dataset_with_prev,
                               batch_size=int(args['--test-batch-size']),
                               shuffle=False)
 
-test_dataset = PredictDataClass(args['--max-length'], args['--test-path'], include_prev_sentence = 0)
+test_dataset = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = 0)
 test_data_loader = DataLoader(test_dataset,
                               batch_size=int(args['--test-batch-size']),
                               shuffle=False)
 
-test_dataset_5words = PredictDataClass(args['--max-length'], args['--test-path'], include_prev_sentence = 0, kwords = 5)
+test_dataset_5words = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = 0, kwords = 5)
 test_data_loader_5words = DataLoader(test_dataset_5kwords,
                               batch_size=int(args['--test-batch-size']),
                               shuffle=False)
 
 
-test_dataset_3words = PredictDataClass(args['--max-length'], args['--test-path'], include_prev_sentence = 0, kwords = 3)
+test_dataset_3words = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = 0, kwords = 3)
 test_data_loader_3words = DataLoader(test_dataset_3kwords,
                               batch_size=int(args['--test-batch-size']),
                               shuffle=False)
