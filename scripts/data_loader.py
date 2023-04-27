@@ -7,6 +7,12 @@ from ekphrasis.classes.tokenizer import SocialTokenizer
 from ekphrasis.classes.preprocessor import TextPreProcessor
 import json 
 
+import sys 
+from os.path import abspath, dirname, join
+tuple_util_path = join(dirname(dirname(dirname(abspath(__file__)))), "emotion-reaction/model-scripts/tuple_utils")
+sys.path.append(tuple_util_path)
+import tuple_utils
+
 # classes = ['1','2a','2b','3a', '3b'] 
 classes = {
     "1": 0, 
@@ -17,6 +23,51 @@ classes = {
     "2a": 1, 
     "2b":1, 
     }
+
+
+lemma_should_get_word = set([
+    "i",
+    "my",
+    "me",
+    "we",
+    "our",
+    "us",
+    "you",
+    "your",
+    "he",
+    "him",
+    "his",
+    "she",
+    "her",
+    "hers",
+    "they",
+    "them",
+    "their"
+    ])
+
+def get_lemmatized_ephrase_with_correct_pronoun(comp_idx, neg_idx, lemmas, words):
+    ret = [] 
+    for compid, nid in zip(comp_idx, neg_idx):
+        if nid is not None: 
+            ret.append('not')
+        for cid in compid:
+            l = lemmas[cid].lower()
+            w = words[cid].lower()
+            if l in lemma_should_get_word:
+                ret.append(w)
+            else:
+                ret.append(l)
+    return " ".join(" ".join(ret).split())
+
+def get_tuples_with_bp(event_dicts, bp_idx, lemmas, words):
+    event_phrases = [] 
+    for edict in event_dicts:
+        word_idx = [ind for comp_ind in edict['event_inds'] for ind in comp_ind]
+        if bp_idx in word_idx:
+            ephrase = get_lemmatized_ephrase_with_correct_pronoun(edict['event_inds'], edict['neg_inds'], lemmas, words)
+            event_phrases.append(ephrase)
+
+    return list(set(event_phrases))
 
 
 def twitter_preprocessor():
@@ -118,67 +169,94 @@ def strip(text):
 
 
 class PredictDataClass(Dataset):
-    def __init__(self, max_length, filename, include_prev_sentence, kwords = 0):
+    def __init__(self, max_length, filename, include_prev_sentence, kwords = 0, use_events = 0):
+        assert ((self.kwords > 0 )+ self.include_prev_sentence) + self.use_events <= 1
+
         self.filename = filename
         self.max_length = max_length
         self.include_prev_sentence = include_prev_sentence
         self.kwords = kwords
+        self.use_events = use_events
         self.data, self.labels = self.load_dataset()
         self.bert_tokeniser = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)    
         self.inputs, self.lengths, self.label_indices = self.process_data()
-        assert ((self.kwords > 0 )+ include_prev_sentence) <= 1
+        
 
 
     def load_dataset(self):
         """
         :return: dataset after being preprocessed and tokenised
         """
-        if self.filename.endswith(".csv"):
-            assert False # because kwords and prev context are not implemented for csv file
-            fobj = pd.read_csv(self.filename, dtype = 'object', skipinitialspace=True)
-            fobj = fobj[fobj['label'].notna()]
-            prev_sentences = [t for t in fobj['prev sentence']]
-            sentences = [t for t in fobj['sentence']]
-            if 'label' in fobj:
-                y_train = [classes[k] for k in fobj["label"]]
-            else:
-                y_train = [-1] * len(sentences)
+        # if self.filename.endswith(".csv"):
+        #     assert False # because kwords and prev context are not implemented for csv file
+        #     fobj = pd.read_csv(self.filename, dtype = 'object', skipinitialspace=True)
+        #     fobj = fobj[fobj['label'].notna()]
+        #     prev_sentences = [t for t in fobj['prev sentence']]
+        #     sentences = [t for t in fobj['sentence']]
+        #     if 'label' in fobj:
+        #         y_train = [classes[k] for k in fobj["label"]]
+        #     else:
+        #         y_train = [-1] * len(sentences)
             
-        elif self.filename.endswith(".json"):
+        if self.filename.endswith(".json"):
             with open(self.filename) as f:
                 fobj = json.load(f)
-            prev_sentences = [" ".join(t['prev_sentence']) for t in fobj]
-            sentences = [t['sentence'] for t in fobj]
-
-            if self.kwords > 0: 
-
-                sentences = []
-                for t in fobj: 
-                    center = t['word_bound'][0] + 1
-                    words = t['sentence'].split() 
-                    left = max(0, center - self.kwords)
-                    right = min(len(words), center + self.kwords + 1)
-                    sentences.append(" ".join(words[left:right]))  
-
-                # sentences = []
-                # for t in fobj: 
-                #     center = t['word_bound'][0] + 1
-                #     words = t['sentence'].split() 
-                #     left = max(0, center - kwords)
-                #     right = min(len(words), center + kwords + 1)
-                #     sentences.append(" ".join(words[left:right]))  
+        else:
+            raise NameError("File must end with .json")
 
 
+        prev_sentences = [" ".join(t['prev_sentence']) for t in fobj]
+        sentences = [t['sentence'] for t in fobj]
+        
+        if self.include_prev_sentence:
+            x_train = [f"{p} {s}" for p, s in zip(prev_sentences, sentences)]
             if 'label' in fobj[0]:
                 y_train = [classes[t['label']] for t in fobj]
             else:
                 y_train = [-1] * len(sentences)
 
-        if self.include_prev_sentence:
-            x_train = [f"{p} {s}" for p, s in zip(prev_sentences, sentences)]
-        else:
-            x_train = [s for s in sentences]
+        elif self.kwords > 0: 
 
+            sentences = []
+            for t in fobj: 
+                center = t['word_bound'][0] + 1
+                words = t['sentence'].split() 
+                left = max(0, center - self.kwords)
+                right = min(len(words), center + self.kwords + 1)
+                sentences.append(" ".join(words[left:right]))  
+
+            # sentences = []
+            # for t in fobj: 
+            #     center = t['word_bound'][0] + 1
+            #     words = t['sentence'].split() 
+            #     left = max(0, center - kwords)
+            #     right = min(len(words), center + kwords + 1)
+            #     sentences.append(" ".join(words[left:right]))  
+            x_train = sentences
+            if 'label' in fobj[0]:
+                y_train = [classes[t['label']] for t in fobj]
+            else:
+                y_train = [-1] * len(sentences)
+        
+        elif use_events:
+            ephrase2exid = {} # ephrase to index in data
+            data = fobj 
+            for i, d in enumerate(data):
+                d['mod_head'] = {int(mod): d['mod_head'][mod] for mod in d['mod_head']}
+                event_dicts = tuple_utils.get_events_for_sentence(d['sentence'].split(), d['pos'], d['lemma'], d['mod_head'], d['ner'])
+                bp_idx = d['word_bound'][0] + 1 
+                ephrases = get_tuples_with_bp(event_dicts, bp_idx, d['lemma'], d['sentence'].split())
+                for ephrase in ephrases:
+                    if ephrase not in ephrase2exid:
+                        ephrase2exid[ephrase] = [] 
+                    ephrase2exid[ephrase].append(i)
+
+            self.ephrase2exid = ephrase2exid
+            self.data = data
+            self.ephrases = list(ephrase_mapping.keys())
+            x_train = ephrases
+            y_train = [-1] * len(sentences)
+            
 
         return x_train, y_train
 
@@ -194,7 +272,6 @@ class PredictDataClass(Dataset):
         inputs, lengths, label_indices = [], [], []
         for x in tqdm(self.data, desc=desc):
             x = ' '.join(preprocessor(x))
-            print(x)
             x = self.bert_tokeniser.encode_plus(segment_a,
                                                 x,
                                                 add_special_tokens=True,
