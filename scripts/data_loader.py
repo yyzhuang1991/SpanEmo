@@ -16,13 +16,8 @@ import tuple_utils
 
 # classes = ['1','2a','2b','3a', '3b'] 
 classes = {
-    "1": 0, 
-    "3":0, 
-    "3a":0, 
-    "3b":0,
+    "1": 0,  
     "2":1, 
-    "2a": 1, 
-    "2b":1, 
     }
 
 
@@ -202,11 +197,15 @@ class PredictDataClass(Dataset):
         #     else:
         #         y_train = [-1] * len(sentences)
             
-        if self.filename.endswith(".json"):
-            with open(self.filename) as f:
-                fobj = json.load(f)
-        else:
-            raise NameError("File must end with .json")
+        # if self.filename.endswith(".json"):
+        #     with open(self.filename) as f:
+        #         fobj = json.load(f)
+        # else:
+        #     raise NameError("File must end with .json")
+
+
+        with open(self.filename) as f:
+            fobj = json.load(f)
 
 
         prev_sentences = [" ".join(t['prev_sentence']) for t in fobj]
@@ -246,7 +245,10 @@ class PredictDataClass(Dataset):
             ephrase2exid = {} # ephrase to index in data
             data = fobj 
             for i, d in enumerate(data):
-                d['mod_head'] = {int(mod): d['mod_head'][mod] for mod in d['mod_head']}
+                # d['mod_head'] = {int(mod): d['mod_head'][mod] for mod in d['mod_head']}
+                mod_head = d['enhancedplusplus_mod_head'] if 'enhancedplusplus_mod_head' in d else d['mod_head'] 
+                mod_head = {int(mod): mod_head[mod] for mod in mod_head}
+
                 event_dicts = tuple_utils.get_events_for_sentence(d['sentence'].split(), d['pos'], d['lemma'], d['mod_head'], d['ner'])
                 bp_idx = d['word_bound'][0] + 1 
                 ephrases = get_tuples_with_bp(event_dicts, bp_idx, d['lemma'], d['sentence'].split())
