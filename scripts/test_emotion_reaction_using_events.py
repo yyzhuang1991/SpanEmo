@@ -85,4 +85,4 @@ macro_pre, macro_rec, macro_f1, _ = precision_recall_fscore_support(true, pred, 
 micro_pre, micro_rec, micro_f1, _ = precision_recall_fscore_support(true, pred, average = 'micro')
 
 
-print(f"  emotion: p = {pres[1]}, r = {recs[1]}\n  non-emotional: p = {pres[0]}, r = {recs[0]}\nmacro f1: {macro_f1}\n")
+print(f"  emotion: p = {pres[1]}, r = {recs[1]}, f1 = {f1s[1]}\n  non-emotional: p = {pres[0]}, r = {recs[0]}, f1 = {f1s[0]}\nmacro pre: {macro_pre}, recl: {macro_rec}, f1: {macro_f1}\n")
