@@ -76,8 +76,7 @@ for exid in range(len(data)):
     d['ephrase_pred'] = ephrase_pred
     d['emotion_label'] = emotion_label
 
-label_mapping = {"1":0, "2":1, "3":0} 
-true = [label_mapping[d['label'][0]] for d in data]
+true = [int(d['label']) - 1 for d in data]
 
 pred = [0 if d['emotion_label'] == 'neutral' else 1 for d in data]
 
