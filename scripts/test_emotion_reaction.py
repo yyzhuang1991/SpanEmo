@@ -62,7 +62,7 @@ else:
 # Define Dataloaders
 #####################################################################
 
-test_dataset_with_prev = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = 3)
+test_dataset_with_prev = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = True)
 test_data_loader_with_prev = DataLoader(test_dataset_with_prev,
                               batch_size=int(args['--test-batch-size']),
                               shuffle=False)
