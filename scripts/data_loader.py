@@ -262,7 +262,12 @@ class PredictDataClass(Dataset):
             self.ephrases = list(ephrase2exid.keys())
             x_train = self.ephrases
             y_train = [-1] * len(sentences)
-            
+        else:
+            x_train = [s for p, s in zip(prev_sentences, sentences)]
+            if 'label' in fobj[0]:
+                y_train = [classes[t['label']] for t in fobj]
+            else:
+                y_train = [-1] * len(sentences)
 
         return x_train, y_train
 
