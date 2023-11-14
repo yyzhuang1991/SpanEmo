@@ -91,6 +91,7 @@ print('The number of Test batches: ', len(test_data_loader_with_prev))
 #############################################################################
 
 for loader, name in zip([test_data_loader, test_data_loader_with_prev, test_data_loader_5words, test_data_loader_3words], ["current-sent", "with-prev", "5words", "3words"]):
+    print(f"-----{name}-----")
     model = SpanEmo(lang=args['--lang'])
 
     learn = Predictor(model, loader, model_path='models/' + args['--model-path'])
