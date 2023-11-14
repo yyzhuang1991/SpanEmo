@@ -173,7 +173,7 @@ class PredictDataClass(Dataset):
         self.kwords = kwords
         self.use_events = use_events
         
-        # assert ((self.kwords > 0 )+ self.include_prev_sentence) + self.use_events <= 1
+        assert ((self.kwords > 0 )+ self.include_prev_sentence) + self.use_events <= 1
         self.data, self.labels = self.load_dataset()
         print(f"{len(self.data)} inputs")
         self.bert_tokeniser = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
