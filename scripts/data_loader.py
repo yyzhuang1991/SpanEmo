@@ -249,7 +249,7 @@ class PredictDataClass(Dataset):
                 mod_head = d['enhancedplusplus_mod_head'] if 'enhancedplusplus_mod_head' in d else d['mod_head'] 
                 mod_head = {int(mod): mod_head[mod] for mod in mod_head}
 
-                event_dicts = tuple_utils.get_events_for_sentence(d['sentence'].split(), d['pos'], d['lemma'], d['mod_head'], d['ner'])
+                event_dicts = tuple_utils.get_events_for_sentence(d['sentence'].split(), d['pos'], d['lemma'], mod_head, d['ner'])
                 bp_idx = d['word_bound'][0] + 1 
                 ephrases = get_tuples_with_bp(event_dicts, bp_idx, d['lemma'], d['sentence'].split())
                 for ephrase in ephrases:
