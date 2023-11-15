@@ -84,7 +84,7 @@ for i in range(3,8):
     pred = learn.predict(device=device)
     # with open(args['--test-path'] + f".out.{name}.json", "w") as f:
     #     json.dump(pred, f)
-    cal_score(true_labels, pred, outfile = args['--test-path']+f"{name}.eval")
+    cal_score(true_labels, pred, outfile = args['--test-path']+"z.eval")
 
 
 
