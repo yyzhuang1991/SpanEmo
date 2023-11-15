@@ -96,7 +96,6 @@ for i in range(3,8):
 
     # true_labels = test_dataset_5words.labels
 
-    print('The number of Test batches: ', len(test_data_loader_with_prev))
     #############################################################################
     # Run the model on a Test set
     #############################################################################
