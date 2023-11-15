@@ -80,7 +80,7 @@ for i in range(3,8):
                                   shuffle=False)
 
     true_labels = test_dataset_5words.labels
-    learn = Predictor(model, test_dataset_5words, model_path='models/' + args['--model-path'])
+    learn = Predictor(model, test_data_loader_5words, model_path='models/' + args['--model-path'])
     pred = learn.predict(device=device)
     # with open(args['--test-path'] + f".out.{name}.json", "w") as f:
     #     json.dump(pred, f)
