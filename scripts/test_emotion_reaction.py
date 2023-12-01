@@ -72,8 +72,8 @@ test_data_loader_with_prev = DataLoader(test_dataset_with_prev,
 #                               shuffle=False)
 # apply predictions on unlabeled data 
 model = SpanEmo(lang=args['--lang'])
-true_labels = [0] * len(test_dataset_5words)
-learn = Predictor(model, test_data_loader_5words, model_path='models/' + args['--model-path'])
+true_labels = [0] * len(test_dataset_with_prev)
+learn = Predictor(model, test_data_loader_with_prev, model_path='models/' + args['--model-path'])
 pred = learn.predict(device=device)
 
 def save_label(pred_labels, outfile):
