@@ -214,7 +214,7 @@ class PredictDataClass(Dataset):
         
         if self.include_prev_sentence:
             x_train = [f"{p} {s}" for p, s in zip(prev_sentences, sentences)]
-            if 'label' in fobj[0]:
+            if 'label' in fobj[0] and fobj[0]['label'] != -1:
                 y_train = [classes[t['label']] for t in fobj]
             else:
                 y_train = [-1] * len(sentences)
