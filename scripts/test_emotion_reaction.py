@@ -61,30 +61,50 @@ else:
 # Define Dataloaders
 #####################################################################
 
-# test_dataset_with_prev = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = True)
-# test_data_loader_with_prev = DataLoader(test_dataset_with_prev,
-#                               batch_size=int(args['--test-batch-size']),
-#                               shuffle=False)
+test_dataset_with_prev = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = True)
+test_data_loader_with_prev = DataLoader(test_dataset_with_prev,
+                              batch_size=int(args['--test-batch-size']),
+                              shuffle=False)
 
 # test_dataset = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = 0)
 # test_data_loader = DataLoader(test_dataset,
 #                               batch_size=int(args['--test-batch-size']),
 #                               shuffle=False)
+# apply predictions on unlabeled data 
 model = SpanEmo(lang=args['--lang'])
+true_labels = [0] * len(test_dataset_5words)
+learn = Predictor(model, test_data_loader_5words, model_path='models/' + args['--model-path'])
+pred = learn.predict(device=device)
 
-for i in range(3,8):
-    print(f" window = {i}")
-    test_dataset_5words = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = 0, kwords = i)
-    test_data_loader_5words = DataLoader(test_dataset_5words,
-                                  batch_size=int(args['--test-batch-size']),
-                                  shuffle=False)
+def save_label(pred_labels, outfile):
+    pred = []
+    print(f"saving predictions to {outfile}")
+    for pred_label in pred_labels:
+        if len(pred_label):
+            pred.append(1)
+        else:
+            pred.append(0)
+    with open(outfile, "w") as f:
+        json.dump(pred, f)    
 
-    true_labels = test_dataset_5words.labels
-    learn = Predictor(model, test_data_loader_5words, model_path='models/' + args['--model-path'])
-    pred = learn.predict(device=device)
-    # with open(args['--test-path'] + f".out.{name}.json", "w") as f:
-    #     json.dump(pred, f)
-    cal_score(true_labels, pred, outfile = args['--test-path']+"z.eval")
+save_label(pred, "my_test_data/predictions.json")
+# with open(args['--test-path'] + f".out.{name}.json", "w") as f:
+#     json.dump(pred, f)
+cal_score(true_labels, pred, outfile = args['--test-path']+"z.eval")
+
+# for i in range(3,8):
+#     print(f" window = {i}")
+#     test_dataset_5words = PredictDataClass(int(args['--max-length']), args['--test-path'], include_prev_sentence = 0, kwords = i)
+#     test_data_loader_5words = DataLoader(test_dataset_5words,
+#                                   batch_size=int(args['--test-batch-size']),
+#                                   shuffle=False)
+
+#     true_labels = test_dataset_5words.labels
+#     learn = Predictor(model, test_data_loader_5words, model_path='models/' + args['--model-path'])
+#     pred = learn.predict(device=device)
+#     # with open(args['--test-path'] + f".out.{name}.json", "w") as f:
+#     #     json.dump(pred, f)
+#     cal_score(true_labels, pred, outfile = args['--test-path']+"z.eval")
 
 
 
